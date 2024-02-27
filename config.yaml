@@ -1,0 +1,7 @@
+motd_text: "Ansbile Managed node by jonjeous"
+
+new_user:
+  username: "jonrecto"
+  password: "password"
+  home_directory: "/home/jonrecto"
+  shell: "/bin/bash"
