@@ -1,0 +1,65 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - config.yaml
+  tasks:
+
+  - name: Install Python3 and Pip3 on Ubuntu
+    apt:
+      name:
+        - python3
+        - python3-pip
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install Python3 and Pip3 on CentOS      
+    yum:
+      name: 
+        - python3
+        - python3-pip
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: Set pip3 as the default pip on Ubuntu
+    alternatives:
+      name: pip
+      path: /usr/bin/pip3
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Set python3 as the default python on Ubuntu
+    alternatives:
+      name: python
+      path: /usr/bin/python3
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install OpenJDK on Ubuntu
+    apt:
+      name:
+        - openjdk-8-jdk
+      state: present
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install OpenJDK on CentOS
+    yum:
+      name:
+        - java-1.8.0-openjdk
+        - java-1.8.0-openjdk-devel
+      state: present
+    when: ansible_distribution == "CentOS"
+
+  - name: Set Motd using variable or default
+    lineinfile:
+      path: /etc/motd
+      line: "{{ motd_text | default('Ansible Managed node by ' ~ ansible_env.SUDO_USER) }}"
+      create: yes
+
+  - name: Create New User
+    user:
+      name: "{{ new_user.username }}"
+      password: "{{ new_user.password | password_hash('sha512') }}"
+      home: "{{ new_user.home_directory }}"
+      shell: "{{ new_user.shell }}"
+      createhome: yes
